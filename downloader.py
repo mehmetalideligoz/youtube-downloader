@@ -15,16 +15,16 @@ def download(video_url, video_quality):
     # HIGH_QUALITY = 1
     # VERY_HIGH_QUALITY = 0
 
-    #returns video_id
+    # Return video_id 
     video_url = video_url.split("&")[0]
     video_id = video_url.split("watch?v=")[1]
     get_info_url = "http://www.youtube.com/get_video_info?video_id=" + video_id
 
-    #video_info contains; autbor, viewers, video's picture etc.
+    #video_info contains; author, viewers, video's picture etc.
     #use parse_qs to split titles and data
     video_info = parse_qs(urllib2.urlopen(get_info_url).read())
 
-    #.decode('utf-8') koymazsak "non ascii charcter..." diye hata veriyor
+    #.decode('utf-8') will prevent "non ascii charcter..." errors.
     title = video_info['title'][0].decode('utf-8')
 
     #different resolutions and codecs in url_maps
@@ -34,22 +34,23 @@ def download(video_url, video_quality):
     for entry in url_encoded_fmt_stream_map:
         entries.append(parse_qs(entry))
 
-    #type ve resolutionlar'ı kullanıcı seçsin (burayı düzenle)
+    # TODO: user should select a resolution
     urls = []
     for entry in entries:
-        urls.append(entry['url'][0])
+        urls.append(entry['url'][0]) # for now, user selects the best resolution
 
 
-    ### title'ı direkt olarak dosya adı yapamıyorum, (herhalde / gibi işaretlerden dolayı)
-    ### sonuna ".mp4" manuel olarak ekledim. Burayı da kullanıcı seçebilsin. 3gp falan da olabilirdi.
+    # Title may contain special characters that cannot be in the filename, so remove them.
+    # TODO: Instead of adding .mp4 at the end, parse the container type of the video
     file_name = re.sub('[!@#$/]', '', title) + ".mp4"
-    directory = "C:/Downloads/Youtube Downloader/"
-
+    directory = "C:/Downloads/YoutubeVideos/"
+    
     dir = os.path.dirname(directory)
 
     if not os.path.exists(directory):
         os.makedirs(directory)
-
+    
+    
     print file_name + " is downloading now..."
 
 
@@ -62,6 +63,7 @@ def download(video_url, video_quality):
 
     return True
 
+# TODO: Instead of returning true or false, return the get_info file so that you don't have to do the same thing twice!
 def check_url(video_url):
 
     if "www.youtube.com/watch?v=" not in video_url:
